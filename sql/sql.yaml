@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sql-deployment
+  labels:
+    app: sql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sql
+  template:    # blueprint   --- 
+    metadata:
+      labels:
+        app: sql
+    spec:
+      containers:
+      - name: sql
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+        - containerPort: 1433
+        resources:
+          limits:
+            cpu: "0.3"
+            memory: "520Mi"
+        requests:
+           cpu: "0"
+           memory: "0"  
+        env:
+        - name: MSSQL_SA_PASSWORD
+          valueFrom:  
+             secretKeyRef:
+               name: sql-secret
+               key: sql-sa-password   
+        - name:  MSSQL_PID
+          valueFrom:  
+            configMapKeyRef:
+              name: sql-secret
+              key: sql-pid      
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sql-service
+spec:
+  selector:
+    app: sql
+  ports:
+    - protocol: TCP
+      port: 1433
+      targetPort: 1433
