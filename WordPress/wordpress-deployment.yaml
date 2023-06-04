@@ -6,14 +6,15 @@ metadata:
     app: wordpress
 spec:
   type: NodePort
-  ports:
-    - protocol: TCP
-      port: 3306
-      targetPort: 3306   #  containerPort for nodejs !
-      nodePort: 30300
+  # type: LoadBalancer
+  ports: 
+  - port: 80
+    protocol: TCP
+    targetPort: 3306   #  containerPort for nodejs !
+    nodePort: 30300
   selector:
     app: wordpress
-    tier: frontend    
+    tier: frontend     
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
